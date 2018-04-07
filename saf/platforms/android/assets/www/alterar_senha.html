@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html >
+    <head>		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="js/jquery.js"></script>
+		<!--<script src="cordova.js"></script>-->
+		<script src="js/bootstrap.min.js" ></script>
+		<!--<script src="js/jquery.maskedinput.js"></script>-->
+		<!--<script src="js/jquery.priceformat.min.js"></script>-->
+		<!--<script src="js/DatePicker.js"></script>-->
+		<script src="js/funcoes.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="DataTables/DataTables-1.10.13/css/dataTables.jqueryui.min.css"/>
+		
+		<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+		<script type="text/javascript" src="DataTables/DataTables-1.10.13/js/dataTables.jqueryui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+		
+		<title>Financeiro Simples</title>
+	</head>
+    <body class="background">
+	
+		<!-- NAVBAR carregado via load ajax arquivo navbar.html -->
+		<div id="load_navbar"></div>
+	
+	
+		<div id="area_desktop_mobile">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">												
+		
+						<h2>ALTERAR SENHA</h2>
+						<br>																				
+						<input type="password" class="form-control" id="antiga_senha" name="antiga_senha" placeholder="Senha Antiga" maxlength="8">
+						<br>
+						<input type="password" class="form-control" id="nova_senha" name="nova_senha" placeholder="Senha Nova" maxlength="8">
+						<br>
+						
+						<button id="alterar" class="btn btn-primary btn-block">Alterar</button>
+						<br>
+						<button id="voltar" class="btn btn-primary btn-block">Voltar</button>
+						<br>
+					  	
+						<div class="alert alert-success fade in" style="display:none;">								
+							<strong>Sucesso!</strong> <span id="msg_alert_sucesso"></span>
+						</div>
+						<div class="alert alert-danger fade in" style="display:none;">								
+							<strong>Falhou!</strong> <span id="msg_alert_erro"></span>
+						</div>
+					
+						
+					</div>
+				</div>	
+			</div>
+		</div>
+    </body>
+</html>
+
+<script>
+	$( document ).ready(function()
+	{
+		//VERIFICA SE ESTÁ LOGADO e RETORNA objeto: usuario_id e login
+		sessao = validaSessao();		
+		usuario_id = sessao['usuario_id'];
+		
+		//CARREGA O NAVBAR
+		$('#load_navbar').load('navbar.html',function() {
+			$('#login').html(sessao['login']);
+		});
+		
+		$("#alterar").click(function()
+		{		
+			$.ajax(
+			{
+				
+				url:url_servidor+"/alterar_senha.php",
+				type:"post",
+				dataType:"json",
+				data:"antiga_senha="+$("#antiga_senha").val()+'&nova_senha='+$("#nova_senha").val()+"&usuario_id="+usuario_id,
+				success: function(data)
+				{
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);
+						$("#nome").val('');
+						$("#login").val('');
+						$("#senha").val('');
+						$("#email").val('');
+					}
+					
+				},
+				error: function (jqXHR, exception)
+				{
+					var msg = '';
+					if (jqXHR.status === 0) {
+						msg = 'Not connect.\n Verify Network.';
+					} else if (jqXHR.status == 404) {
+						msg = 'Requested page not found. [404]';
+					} else if (jqXHR.status == 500) {
+						msg = 'Internal Server Error [500].';
+					} else if (exception === 'parsererror') {
+						msg = 'Requested JSON parse failed.';
+					} else if (exception === 'timeout') {
+						msg = 'Time out error.';
+					} else if (exception === 'abort') {
+						msg = 'Ajax request aborted.';
+					} else {
+						msg = 'Uncaught Error.\n' + jqXHR.responseText;
+					}
+					$(".alert-danger").hide();
+					$(".alert-danger").slideDown(500);
+					$("#msg_alert_erro").html(msg);
+				},
+				
+			});//FIM AJAX
+			
+		});//FIM BOTÃO ENTRAR
+
+		
+		$("#voltar").click(function()
+		{
+			window.location = 'painel_controle.html';
+		});
+		
+	});//FIM DOCUMENT READY
+	
+</script>
+

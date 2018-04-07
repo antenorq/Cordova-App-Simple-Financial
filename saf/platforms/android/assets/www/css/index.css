@@ -1,0 +1,160 @@
+
+html, body{
+	height:100%;
+}
+.area_container{
+	height:100%; 
+}
+.background {
+    background: url("../img/background.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+/* Layout para desktops: 769 px até o máximo de 1232 px. Herda estilos de: Layout para celulares e Layout para tablets. */    
+@media only screen and (min-width: 769px)
+{
+	#area_desktop_mobile
+	{
+		/*background: #333347;*/
+		/*text-align: center;*/
+		height:auto; 
+		min-height:100%;
+		height: 100%;
+		color:#000;
+		
+		width:500px;
+		
+		margin:0 auto;
+		padding-top:50px;
+	}
+	
+	.navbar-collapse
+	{
+		display:block;
+	}
+}
+
+
+.navbar-collapse
+{
+	display:none;
+}
+
+#area_desktop_mobile
+{
+	/*background: #333347;*/
+    /*text-align: center;*/
+	height:auto; 
+	min-height:100%;
+	height: 100%;
+	color:#000;
+	padding-top:50px;
+	
+}
+
+#area_desktop_mobile h2
+{
+	text-align:center;
+}
+
+#area_desktop_mobile img
+{
+	margin: 0 auto;	
+}
+
+
+
+
+h2
+{
+	color:#ffffff;
+}
+
+#area_painel_controle
+{
+	padding-top:50px;
+	height:100%;
+	background: rgba(19,97,171,1);	
+}
+#area_painel_controle a
+{
+	color:#fff;
+}
+#area_painel_controle a:hover
+{
+	color:#888;
+}
+
+#area_painel_controle .row
+{
+	height:33%;
+	color:#fff;
+	text-align:center;
+}
+
+#area_painel_controle .back_azul_claro
+{
+	height:100%;	
+
+	background: rgba(19,97,171,1);
+	background: -moz-radial-gradient(center, ellipse cover, rgba(19,97,171,1) 0%, rgba(16,67,122,1) 100%);
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(19,97,171,1)), color-stop(100%, rgba(16,67,122,1)));
+	background: -webkit-radial-gradient(center, ellipse cover, rgba(19,97,171,1) 0%, rgba(16,67,122,1) 100%);
+	background: -o-radial-gradient(center, ellipse cover, rgba(19,97,171,1) 0%, rgba(16,67,122,1) 100%);
+	background: -ms-radial-gradient(center, ellipse cover, rgba(19,97,171,1) 0%, rgba(16,67,122,1) 100%);
+	background: radial-gradient(ellipse at center, rgba(19,97,171,1) 0%, rgba(16,67,122,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1361ab', endColorstr='#10437a', GradientType=1 );	
+	
+}
+
+#area_painel_controle .back_azul_escuro
+{
+	
+	height:100%;	
+	
+	background: rgba(16,81,142,1);
+	background: -moz-radial-gradient(center, ellipse cover, rgba(16,81,142,1) 0%, rgba(13,57,104,1) 100%);
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(16,81,142,1)), color-stop(100%, rgba(13,57,104,1)));
+	background: -webkit-radial-gradient(center, ellipse cover, rgba(16,81,142,1) 0%, rgba(13,57,104,1) 100%);
+	background: -o-radial-gradient(center, ellipse cover, rgba(16,81,142,1) 0%, rgba(13,57,104,1) 100%);
+	background: -ms-radial-gradient(center, ellipse cover, rgba(16,81,142,1) 0%, rgba(13,57,104,1) 100%);
+	background: radial-gradient(ellipse at center, rgba(16,81,142,1) 0%, rgba(13,57,104,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#10518e', endColorstr='#0d3968', GradientType=1 );
+}
+
+
+.center_vertical
+{
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	 
+}
+.icon_maior
+{
+	font-size:40px;
+}
+
+.img_navbar
+{
+	margin-top: -10px;
+	width: 40px;
+	float: left;
+	margin-right: 10px;
+}
+/*
+input[type="date"]{
+    color:#555;
+}
+input[type="date"]:before{
+    color:#ccc;
+    content:attr(placeholder);
+}
+
+input[type="date"].full:before {
+    color:#000;
+    content:""!important;
+}
+*/

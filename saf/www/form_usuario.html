@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html >
+    <head>		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="js/jquery.js"></script>		
+		<script src="js/bootstrap.min.js" ></script>
+		<script src="js/jquery.maskedinput.js"></script>
+		<script src="js/funcoes.js"></script>
+		<!--<script src="js/DatePicker.js"></script>-->
+
+		<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="DataTables/DataTables-1.10.13/css/dataTables.jqueryui.min.css"/>
+
+		<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+		<script type="text/javascript" src="DataTables/DataTables-1.10.13/js/dataTables.jqueryui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+
+		<title>Controle Financeiro</title>
+	</head>
+    <body class="background">
+	
+		<!-- NAVBAR carregado via load ajax arquivo navbar.html -->
+		<div id="load_navbar"></div>
+	
+	
+		<div id="area_desktop_mobile">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">												
+		
+						<h2>USUÁRIO</h2>
+						<br>
+						<input type="text" class="form-control" id="nome" name="nome" placeholder="Nome">
+						<br>														
+						<input type="text" class="form-control" id="login" name="login" placeholder="Login">
+						<br>														
+						<input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" maxlength="8">
+						<br>														
+						<input type="text" class="form-control" id="email" name="email" placeholder="Email">
+						<br>						
+						
+						<button id="cadastrar" class="btn btn-primary btn-block">Cadastrar</button>
+						<br>
+						<button id="voltar" class="btn btn-primary btn-block">Voltar</button>
+						<br>
+					  	
+						<div class="alert alert-success fade in" style="display:none;">								
+							<strong>Sucesso!</strong> <span id="msg_alert_sucesso"></span>
+						</div>
+						<div class="alert alert-danger fade in" style="display:none;">								
+							<strong>Falhou!</strong> <span id="msg_alert_erro"></span>
+						</div>
+					
+						
+					</div>
+				</div>	
+			</div>
+		</div>
+    </body>
+</html>
+
+<script>
+	$( document ).ready(function()
+	{
+	
+		$("#cadastrar").click(function()
+		{		
+			$.ajax(
+			{
+				
+				url:url_servidor+"/add_usuario.php",
+				type:"post",
+				dataType:"json",
+				data:"nome="+$("#nome").val()+'&login='+$("#login").val()+'&senha='+$("#senha").val()+'&email='+$("#email").val(),
+				success: function(data)
+				{
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);
+						$("#nome").val('');
+						$("#login").val('');
+						$("#senha").val('');
+						$("#email").val('');
+					}
+					
+				},
+				error: function (jqXHR, exception)
+				{
+					var msg = '';
+					if (jqXHR.status === 0) {
+						msg = 'Not connect.\n Verify Network.';
+					} else if (jqXHR.status == 404) {
+						msg = 'Requested page not found. [404]';
+					} else if (jqXHR.status == 500) {
+						msg = 'Internal Server Error [500].';
+					} else if (exception === 'parsererror') {
+						msg = 'Requested JSON parse failed.';
+					} else if (exception === 'timeout') {
+						msg = 'Time out error.';
+					} else if (exception === 'abort') {
+						msg = 'Ajax request aborted.';
+					} else {
+						msg = 'Uncaught Error.\n' + jqXHR.responseText;
+					}
+					$(".alert-danger").hide();
+					$(".alert-danger").slideDown(500);
+					$("#msg_alert_erro").html(msg);
+				},
+				
+			});//FIM AJAX
+			
+		});//FIM BOTÃO ENTRAR
+
+		
+		$("#voltar").click(function()
+		{
+			window.location = 'index.html';
+		});
+		
+	});//FIM DOCUMENT READY
+	
+</script>
+

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+    <head>		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="js/jquery.js"></script>		
+		<script src="js/bootstrap.min.js" ></script> 
+		<script src="js/jquery.maskedinput.js"></script>
+		<script src="js/funcoes.js"></script>
+		<!--<script src="js/DatePicker.js"></script>-->
+
+		<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="DataTables/DataTables-1.10.13/css/dataTables.jqueryui.min.css"/>
+
+		<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+		<script type="text/javascript" src="DataTables/DataTables-1.10.13/js/dataTables.jqueryui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+
+		<title>Controle Financeiro</title>
+	</head>
+		
+    </head>
+    <body class="background">
+	
+		<!-- NAVBAR carregado via load ajax arquivo navbar.html -->
+		<div id="load_navbar"></div>	
+	
+		<div id="area_desktop_mobile">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">												
+
+						<h2>CATEGORIA</h2>
+						<br>
+						
+						<!-- FORM CADASTRO -->
+						<select class="form-control" id="tipo_id" name="tipo_id">
+							<option value="">Tipo categoria</option>
+							<option value="1">Receita</option>
+							<option value="2">Despesa</option>
+						</select>
+						<br>
+						<input type="text" class="form-control" id="descricao" name="descricao" placeholder="Categoria">
+						<br>
+						<button id="cadastrar" class="btn btn-primary btn-block">Cadastrar</button>
+						
+						<button id="atualizar" class="btn btn-primary btn-block">Atualizar</button>
+						<input type="hidden" class="form-control" id="id" name="id" value="">
+						<br>
+					  	
+						<div class="alert alert-success fade in" style="display:none;">								
+							<strong>Sucesso!</strong> <span id="msg_alert_sucesso"></span>
+						</div>
+						<div class="alert alert-danger fade in" style="display:none;">								
+							<strong>Atenção!</strong> <span id="msg_alert_erro"></span>
+						</div>
+						
+						<!-- DATA TABLE -->
+						<table id="tabela_categoria" class="display" width="100%" cellspacing="0">
+							<thead>
+								<tr>
+									<th>Tipo</th>
+									<th>Descrição</th>
+									<th>Edit / Delete</th>
+								</tr>
+							</thead>
+						</table>
+						
+						
+					</div>
+				</div>	
+			</div>
+		</div>
+    </body>
+</html>
+
+<script>	
+	var table;
+	var usuario_id;
+	
+	$( document ).ready(function()
+	{	
+		//VERIFICA SE ESTÁ LOGADO e RETORNA objeto: usuario_id e login
+		sessao = validaSessao();
+		usuario_id = sessao['usuario_id'];
+	
+		//CARREGA O NAVBAR
+		$('#load_navbar').load('navbar.html',function() {
+			$('#login').html(sessao['login']);
+		});
+		
+		$('#atualizar').hide();
+		
+		table = $('#tabela_categoria').DataTable(
+		{
+			"bJQueryUI": true,
+				
+			"ajax": {
+				"url": url_servidor+"/busca_categorias.php",
+				"method": "POST",
+				"data": function (d) 
+				{
+					d.usuario = usuario_id;					
+				}
+				
+			},
+			"columns":
+			[
+				{ "data": "tipo_categoria" },
+				{ "data": "categoria" },
+				{ "data": "id",
+				  "render": function ( data, type, full, meta )
+				  {
+					return '<button type="button" class="btn btn-primary btn-xs" onclick="editarCategoria('+data+')">Edit</button> <button type="button" class="btn btn-danger btn-xs" onclick="excluirCategoria('+data+')">Excluir</button>';
+				  }
+				}
+			],
+			
+			"order": [[ 0, 'asc' ], [ 1, 'asc' ]],			
+		
+			"oLanguage": {
+				"sLengthMenu": "Mostrar _MENU_",
+				"sZeroRecords": "Nenhum registro encontrado",
+				"sInfo": "Mostrando _START_ / _END_ de _TOTAL_ registro(s)",
+				"sInfoEmpty": "Mostrando 0 / 0 de 0 registros",
+				"sInfoFiltered": "(filtrado de _MAX_ registros)",
+				"sSearch": "Pesquisar: ",
+				"oPaginate": {
+					"sFirst": "Início",
+					"sPrevious": "Anterior",
+					"sNext": "Próximo",
+					"sLast": "Último"
+				}
+			},
+						
+			"processing": true				
+			
+        }); 
+			
+			
+		//CADASTRAR CATEGORIA
+		$("#cadastrar").click(function()
+		{		
+			$.ajax(
+			{				
+				url:url_servidor+"/add_categoria.php",
+				type:"post",
+				dataType:"json",
+				data:"descricao="+$("#descricao").val()+'&tipo_id='+$("#tipo_id").val()+'&usuario='+usuario_id,
+				success: function(data)
+				{	
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);
+						$("#descricao").val('');
+						$("#valor").val('');
+						$("#categoria").val('');						
+						table.ajax.reload();						
+					}
+					
+				}				
+				
+			});//FIM AJAX
+			
+		});//FIM BOTÃO ENTRAR	
+		
+		
+		//ATUALIZAR CATEGORIA
+		$("#atualizar").click(function()
+		{		
+			$.ajax(
+			{				
+				url:url_servidor+"/update_categoria.php",
+				type:"post",
+				dataType:"json",
+				data:"descricao="+$("#descricao").val()+'&id='+$("#id").val()+'&tipo_id='+$("#tipo_id").val()+'&usuario='+usuario_id,
+				success: function(data)
+				{	
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);
+						$("#descricao").val('');						
+						$("#categoria").val('');
+						$('#atualizar').hide();
+						$('#cadastrar').show();
+						table.ajax.reload();						
+					}
+					
+				}
+				
+			});//FIM AJAX
+			
+		});//FIM BOTÃO ATUALIZAR
+		
+	});//FIM DOCUMENT READY
+	
+	
+	//EXCLUIR CATEGORIA
+	function excluirCategoria(id)
+	{
+	
+		if ( confirm( "Deseja realmente excluir essa categoria?" ) )
+		{
+		
+			$.ajax(
+			{
+				url:url_servidor+"/excluir_categoria.php",
+				type:"post",
+				dataType:"json",
+				data:"id="+id+'&usuario='+usuario_id,
+				success: function(data)
+				{	
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);									
+						table.ajax.reload();
+						
+					}
+					
+				}
+				
+			});//FIM AJAX
+		}
+	}
+	
+	//EDITAR CATEGORIA
+	function editarCategoria(id)
+	{		
+		$('#atualizar').attr('style','display:block');
+		$('#cadastrar').hide();
+		$('#id').val(id);
+		$('html, body').animate({scrollTop:0}, 'slow');
+	
+		$.ajax(
+		{
+			url:url_servidor+"/editar_categoria.php",
+			type:"post",
+			dataType:"json",
+			data:"id="+id+'&usuario='+usuario_id,
+			success: function(data)
+			{	
+				if(data.erro)
+				{
+					$(".alert-success").hide();
+					$(".alert-danger").hide();
+					$(".alert-danger").slideDown(500);
+					$("#msg_alert_erro").html(data.erro);
+				}
+				else
+				{
+					$(".alert-success").hide();
+					$(".alert-danger").hide();
+					//$(".alert-success").slideDown(500);						
+					//$("#msg_alert_sucesso").html(data.sucesso);
+					$("#tipo_id").val(data.tipo_id);
+					$("#descricao").val(data.descricao);						
+					//table.ajax.reload();
+					
+				}
+				
+			}
+			
+		});//FIM AJAX
+		
+	}
+
+</script>
+

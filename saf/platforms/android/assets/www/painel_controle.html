@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="js/jquery.js"></script>		
+		<script src="js/bootstrap.min.js" ></script>
+		<script src="js/jquery.maskedinput.js"></script>
+		<script src="js/funcoes.js"></script>
+		<!--<script src="js/DatePicker.js"></script>-->
+
+		<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="DataTables/DataTables-1.10.13/css/dataTables.jqueryui.min.css"/>
+
+		<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+		<script type="text/javascript" src="DataTables/DataTables-1.10.13/js/dataTables.jqueryui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+
+		<title>Financeiro Simples</title>
+	</head>
+    <body>
+		<!-- NAVBAR carregado via load ajax arquivo navbar.html -->
+		<div id="load_navbar"></div>
+		
+		<!-- PAINEL CONTROLE -->
+		<div id="area_painel_controle">
+			<div class="container-fluid area_container">
+				<div class="row linha1">
+					<a href="form_receita.html"><div class="col-xs-6 back_azul_claro"><div class="center_vertical"><span style="color:#67f011;" class="glyphicon glyphicon-plus-sign icon_maior"></span><br><br>RECEITA</div></div></a>
+					<a href="form_despesa.html"><div class="col-xs-6 back_azul_escuro"><div class="center_vertical"><span style="color:#ff1a00;" class="glyphicon glyphicon-minus-sign icon_maior"></span><br><br>DESPESA</div></div></a>			
+				</div>
+				<div class="row linha2">
+					<a href="form_consulta.html"><div class="col-xs-6 back_azul_escuro"><div class="center_vertical"><span class="glyphicon glyphicon-search icon_maior"></span><br><br>CONSULTA</div></div></a>				
+					<a href="form_categoria.html"><div class="col-xs-6 back_azul_claro"><div class="center_vertical"><span class="glyphicon glyphicon-th-list icon_maior"></span><br><br>CATEGORIA</div></div></a>
+				</div>
+				<div class="row linha3">
+					<a href="alterar_senha.html"><div class="col-xs-6 back_azul_claro"><div class="center_vertical"><span class="glyphicon glyphicon-wrench icon_maior"></span><br><br>ALTERAR SENHA</div></div></a>	
+					<a href="logout.html"><div class="col-xs-6 back_azul_escuro"><div class="center_vertical"><span class="glyphicon glyphicon-remove-sign icon_maior"></span><br><br>SAIR</div></div></a>					
+				</div>
+			</div>
+		</div>
+    </body>
+</html>
+<script>
+	$( document ).ready(function()
+	{			
+		//VERIFICA SE ESTÁ LOGADO e RETORNA objeto: usuario_id e login
+		sessao = validaSessao();		
+	
+		$('#load_navbar').load('navbar.html',function() {
+			$('#login').html(sessao['login']);
+		});		
+		
+	});
+</script>

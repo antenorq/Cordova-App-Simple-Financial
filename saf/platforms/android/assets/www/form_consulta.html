@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html >
+    <head>		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="js/jquery.js"></script>
+		<script src="cordova.js"></script>
+		<script src="js/bootstrap.min.js" ></script>
+		<script src="js/jquery.maskedinput.js"></script>
+		<script src="js/jquery.priceformat.min.js"></script>
+		<script src="js/DatePicker.js"></script>
+		<script src="js/funcoes.js"></script>
+		
+
+		<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="DataTables/DataTables-1.10.13/css/dataTables.jqueryui.min.css"/>
+
+		<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+		<script type="text/javascript" src="DataTables/DataTables-1.10.13/js/dataTables.jqueryui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+
+		<title>Controle Financeiro</title>
+	</head>
+    <body class="background">
+	
+		<!-- NAVBAR carregado via load ajax arquivo navbar.html -->
+		<div id="load_navbar"></div>	
+	
+		<div id="area_desktop_mobile">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						
+						<h2>CONSULTA</h2>
+						<br>
+						<div id="area_consulta">
+							<select class="form-control" id="tipo" name="tipo">
+								<option value="">Escolha o Tipo</option>
+								<option value="0">Todos</option>
+								<option value="1">Receita</option>
+								<option value="2">Despesa</option>
+							</select>
+							<br>
+							<select class="form-control" id="categoria" name="categoria">
+								<option value="0">Todos</option>
+							</select>
+							<br>		
+							<input type="text" class="form-control" id="data_de" name="data_de" maxlength="10" placeholder="Data Inicial">
+							<br>
+							<input type="text" class="form-control" id="data_ate" name="data_ate" maxlength="10" placeholder="Data Final">							
+							<br>										
+							
+							<button id="consultar" class="btn btn-primary btn-block">CONSULTA</button>
+							<br>
+						</div>
+						
+						<div id="resultado" style="display:none;">
+							
+							<!-- DATA TABLE -->
+							<table id="tabela_consulta" class="display" width="100%" cellspacing="0">
+								<thead>
+									<tr>
+										<th>Data</th>
+										<th>Descr</th>										
+										<th>Valor</th>										
+									</tr>
+								</thead>
+							</table>						
+							
+						</div>
+					  	
+						<div class="alert alert-success fade in" style="display:none;">								
+							<strong>Sucesso!</strong> <span id="msg_alert_sucesso"></span>
+						</div>
+						<div class="alert alert-danger fade in" style="display:none;">								
+							<strong>Falhou!</strong> <span id="msg_alert_erro"></span>
+						</div>				
+						
+					</div>
+				</div>	
+			</div>
+		</div>
+    </body>
+</html>
+
+<script>
+
+
+	$( document ).ready(function()
+	{
+		//VERIFICA SE ESTÁ LOGADO e RETORNA objeto: usuario_id e login
+		sessao = validaSessao();		
+		usuario_id = sessao['usuario_id'];
+		
+		//CARREGA O NAVBAR
+		$('#load_navbar').load('navbar.html',function() {
+			$('#login').html(sessao['login']);
+		});
+	
+		$("#data_de").click(function()
+		{
+			//plugin cordova datepicker
+			abrirData(this,'');
+		});
+		
+		$("#data_ate").click(function()
+		{
+			//plugin cordova datepicker
+			abrirData(this,'');
+		});
+				
+		
+		//Monta de início todas as categorias
+		selectCategorias(0,1);
+	
+		$("#consultar").click(function()
+		{	
+			
+			$('#resultado').show();
+			
+			//table.destroy();
+			table = $('#tabela_consulta').DataTable(
+			{
+				
+				"bJQueryUI": true,
+					
+				"ajax": {
+					"url":url_servidor+"/consulta.php",
+					"method": "POST",
+					"data": function (d) 
+					{
+						d.usuario_id 	= usuario_id;
+						d.data_de 	= $("#data_de").val();
+						d.data_ate	= $("#data_ate").val();
+						d.tipo		= $("#tipo").val();
+						d.categoria	= $("#categoria").val();
+				
+					}
+					
+				},
+				
+				"fnRowCallback": function( Row, Data, iDisplayIndex, iDisplayIndexFull )
+				{
+                    if ( Data['tipo'] == "1" )
+                    {
+                        $('td', Row).css('background-color', '#dff0d8');
+                    }
+                    else if ( Data['tipo'] == "2" )
+                    {
+                        $('td', Row).css('background-color', '#f2dede');
+                    }
+                },
+				
+				"columns":
+				[
+					{ "data": "data" },
+					{ "data": "descricao",
+						"render": function ( data, type, row )
+						{
+							return data +' <br><div style="font-size:10px;text-align:left;">('+ row['categoria']+')</div>';
+						}
+					},					
+					{ "data": "valor",
+						"render": function ( data, type, row )
+						{
+							if(row['tipo'] == 1)
+							{
+								return "+"+data;
+							}
+							if(row['tipo'] == 2)
+							{
+								return "-"+data;
+							}							
+						}				
+					},
+					//{ "data": "tipo" },					
+				],
+				
+				"columnDefs": [{
+				  type: 'date-br',
+				  targets: 0
+				}],
+				
+				"order": [[ 0, 'desc' ], [ 1, 'asc' ]],
+			
+				"oLanguage": {
+					"sLengthMenu": "Mostrar _MENU_",
+					"sZeroRecords": "Nenhum registro encontrado",
+					"sInfo": "Mostrando _START_ / _END_ de _TOTAL_ registro(s)",
+					"sInfoEmpty": "Mostrando 0 / 0 de 0 registros",
+					"sInfoFiltered": "(filtrado de _MAX_ registros)",
+					"sSearch": "Pesquisar: ",
+					"oPaginate": {
+						"sFirst": "Início",
+						"sPrevious": "Anterior",
+						"sNext": "Próximo",
+						"sLast": "Último"
+					}
+				},
+							
+				//"processing": true	,
+				
+				destroy: true				
+				
+			});
+			
+		});//FIM BOTÃO CONSULTAR
+		
+		
+		$("#tipo").change(function()
+		{	
+			var tipo = $("#tipo option:selected").val();
+			selectCategorias(tipo,1);
+		});
+
+		
+		
+	});//FIM DOCUMENT READY
+
+	
+</script>
+

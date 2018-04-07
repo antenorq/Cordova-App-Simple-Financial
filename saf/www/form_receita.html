@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+    <head>		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="js/jquery.js"></script>
+		<script src="cordova.js"></script>
+		<script src="js/bootstrap.min.js" ></script>
+		<script src="js/jquery.maskedinput.js"></script>
+		<script src="js/jquery.priceformat.min.js"></script>
+		<script src="js/DatePicker.js"></script>
+		<script src="js/funcoes.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="DataTables/DataTables-1.10.13/css/dataTables.jqueryui.min.css"/>
+
+		<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+		<script type="text/javascript" src="DataTables/DataTables-1.10.13/js/dataTables.jqueryui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+
+		<title>Controle Financeiro</title>
+	</head>
+    <body class="background">
+	
+		<!-- NAVBAR carregado via load ajax arquivo navbar.html -->
+		<div id="load_navbar"></div>
+	
+		<div id="area_desktop_mobile">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						
+						<h2>RECEITA</h2>
+						<br>
+						<select class="form-control" id="categoria" name="categoria" placeholder="Categoria">
+						
+						</select>
+						<br>
+						<input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição">
+						<br>														
+						<input type="text" class="form-control" id="valor" name="valor" placeholder="Valor" maxlength="10">
+						<br>						
+						<input type="text" class="form-control" id="data" name="data" maxlength="10" placeholder="Data" >
+						<br>
+						
+						<button id="cadastrar" class="btn btn-primary btn-block">Cadastrar</button>
+						
+						<button id="atualizar" class="btn btn-primary btn-block">Atualizar</button>
+						<input type="hidden" class="form-control" id="id" name="id" value="">
+						<br>						
+						
+						<div class="alert alert-success fade in" style="display:none;">
+							<strong>Sucesso!</strong> <span id="msg_alert_sucesso"></span>
+						</div>
+						<div class="alert alert-danger fade in" style="display:none;">
+							<strong>Falhou!</strong> <span id="msg_alert_erro"></span>
+						</div>
+						
+						<!-- DATA TABLE -->
+						<table id="tabela_receita" class="display" width="100%" cellspacing="0">
+							<thead>
+								<tr>
+									<th>Data</th>
+									<th>Descr</th>
+									<!-- <th>Categ</th> -->
+									<th>Valor</th>
+									<th>Edit / Delete</th>
+								</tr>
+							</thead>
+						</table>
+						<!--
+						<button id = "cameraTakePicture">TAKE PICTURE</button>
+						<button id = "cameraGetPicture">GET PICTURE</button>
+						<img id = "myImage"></img>
+						-->						
+					</div>
+				</div>	
+			</div>
+		</div>
+    </body>
+</html>
+
+<script>
+	/*
+	document.addEventListener("deviceready", onDeviceReady, false);
+	
+	function onDeviceReady() {
+		document.getElementById("cameraTakePicture").addEventListener("click", cameraTakePicture);
+		document.getElementById("cameraGetPicture").addEventListener("click", cameraGetPicture);
+	}
+
+	function cameraTakePicture()
+	{
+	   navigator.camera.getPicture(onSuccess, onFail, { 
+		  quality: 50,
+		  destinationType: Camera.DestinationType.DATA_URL
+	   });
+
+	   function onSuccess(imageData) {
+		  var image = document.getElementById('myImage');
+		  image.src = "data:image/jpeg;base64," + imageData;
+	   }
+
+	   function onFail(message) {
+		  alert('Failed because: ' + message);
+	   }
+	}
+	
+	
+	function cameraGetPicture()
+	{
+	   navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+		  destinationType: Camera.DestinationType.DATA_URL,
+		  sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+	   });
+
+	   function onSuccess(imageURL) {
+		  var image = document.getElementById('myImage');
+		  image.src = imageURL;
+	   }
+
+	   function onFail(message) {
+		  alert('Failed because: ' + message);
+	   }
+
+	}
+	*/
+
+	
+	
+	var usuario_id;
+	//var qtdClickData = 0;
+	
+	$( document ).ready(function()
+	{	
+		//VERIFICA SE ESTÁ LOGADO e RETORNA objeto: usuario_id e login
+		sessao = validaSessao();		
+		usuario_id = sessao['usuario_id'];
+		
+		//CARREGA O NAVBAR
+		$('#load_navbar').load('navbar.html',function() {
+			$('#login').html(sessao['login']);
+		});
+		
+		$('#atualizar').hide();
+	
+		//FORMATA VALOR
+		$('#valor').priceFormat({
+			prefix: '',
+			thousandsSeparator: '',
+			clearOnEmpty: true
+		});	
+		
+		$("#data").click(function()
+		{
+			//plugin cordova datepicker
+			abrirData(this,'');
+		});
+
+		//FAZER CLICK AUTOMATICO NO CAMPO DATA PARA TROCAR O TIPO DATE E ABRIR O DATE ANDROID
+		/*
+		$("#data").click(function(e)
+		{
+			//só transforma em date 1 vez
+			if($(this).attr('type') == 'text')
+			{
+				$(this).attr('type', 'date');
+			}			
+			if(qtdClickData == 0)
+			{			
+				qtdClickData = 1;
+				
+				$("#data").trigger('click');
+			}
+		});
+		*/
+		
+	
+		//CARREGA COMBO CATEGORIAS
+		selectCategorias(1);
+		
+		
+		table = $('#tabela_receita').DataTable(
+		{
+			"bJQueryUI": true,
+				
+			"ajax": {
+				"url": url_servidor+"/busca_receitas.php",
+				"method": "POST",
+				"data": function (d) 
+				{
+					d.usuario = usuario_id;					
+				}
+				
+			},
+			
+			"fnRowCallback": function( Row, Data, iDisplayIndex, iDisplayIndexFull )
+			{				
+				$('td', Row).css('background-color', '#dff0d8');				
+			},
+			
+			"columns":
+			[
+				{ "data": "data" },
+				{ "data": "descricao",
+					"render": function ( data, type, row )
+					{
+						return data +' <br><div style="font-size:10px;text-align:left;">('+ row['categoria']+')</div>';
+					}
+				},
+				//{ "data": "categoria" },
+				{ "data": "valor",
+					"render": function ( data, type, row )
+					{							
+						return "+"+data;													
+					}
+				},			
+				{ "data": "id",
+				  "render": function ( data, type, full, meta )
+				  {
+					return '<button type="button" class="btn btn-primary btn-xs" onclick="editarReceita('+data+')">Edit</button> <button type="button" class="btn btn-danger btn-xs" onclick="excluirReceita('+data+')">Excluir</button>';
+				  }
+				}
+			],
+			
+			"columnDefs": [{
+			  type: 'date-br',
+			  targets: 0
+			}],
+			
+			
+			"order": [[ 0, 'desc' ], [ 1, 'asc' ]],			
+		
+			"oLanguage": {
+				"sLengthMenu": "Mostrar _MENU_",
+				"sZeroRecords": "Nenhum registro encontrado",
+				"sInfo": "Mostrando _START_ / _END_ de _TOTAL_ registro(s)",
+				"sInfoEmpty": "Mostrando 0 / 0 de 0 registros",
+				"sInfoFiltered": "(filtrado de _MAX_ registros)",
+				"sSearch": "Pesquisar: ",
+				"oPaginate": {
+					"sFirst": "Início",
+					"sPrevious": "Anterior",
+					"sNext": "Próximo",
+					"sLast": "Último"
+				}
+			},
+						
+			"processing": true				
+			
+        }); 
+	
+	
+		$("#cadastrar").click(function()
+		{
+			$.ajax(
+			{				
+				url:url_servidor+"/add_receita.php",
+				type:"post",
+				dataType:"json",
+				data:"descricao="+$("#descricao").val()+"&valor="+$("#valor").val()+"&data="+$("#data").val()+"&categoria="+$("#categoria").val()+"&usuario_id="+usuario_id,
+				success: function(data)
+				{
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);
+						$("#descricao").val('');
+						$("#valor").val('');
+						$("#data").val('');
+						$("#categoria").val('');
+						table.ajax.reload();
+					}
+					
+				}
+				
+			});//FIM AJAX
+			
+		});//FIM BOTÃO ENTRAR
+			
+		
+		//ATUALIZAR RECEITA
+		$("#atualizar").click(function()
+		{		
+			$.ajax(
+			{				
+				url:url_servidor+"/update_receita.php",
+				type:"post",
+				dataType:"json",
+				data:"descricao="+$("#descricao").val()+'&id='+$("#id").val()+"&valor="+$("#valor").val()+"&data="+$("#data").val()+"&categoria="+$("#categoria").val()+"&usuario_id="+usuario_id,
+				success: function(data)
+				{
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);
+						$("#descricao").val('');
+						$("#valor").val('');
+						$("#categoria").val('');
+						$("#data").val('');
+						$('#atualizar').hide();
+						$('#cadastrar').show();
+						table.ajax.reload();						
+					}
+					
+				}
+				
+			});//FIM AJAX
+			
+		});//FIM BOTÃO ATUALIZAR
+		
+		
+		
+		
+	});//FIM DOCUMENT READY
+	
+	
+	
+	//EXCLUIR RECEITA
+	function excluirReceita(id)
+	{
+	
+		if ( confirm( "Deseja realmente excluir essa receita?" ) )
+		{
+		
+			$.ajax(
+			{
+				url:url_servidor+"/excluir_receita.php",
+				type:"post",
+				dataType:"json",
+				data:"id="+id+'&usuario='+usuario_id,
+				success: function(data)
+				{	
+					if(data.erro)
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-danger").slideDown(500);
+						$("#msg_alert_erro").html(data.erro);
+					}
+					else
+					{
+						$(".alert-success").hide();
+						$(".alert-danger").hide();
+						$(".alert-success").slideDown(500);						
+						$("#msg_alert_sucesso").html(data.sucesso);									
+						table.ajax.reload();
+						
+					}
+					
+				}
+				
+			});//FIM AJAX
+		}
+	}
+	
+	
+	//EDITAR RECEITA
+	function editarReceita(id)
+	{		
+		$('#atualizar').attr('style','display:block');
+		$('#cadastrar').hide();
+		$('#id').val(id);
+		$('html, body').animate({scrollTop:0}, 'slow');
+	
+		$.ajax(
+		{
+			url:url_servidor+"/editar_receita.php",
+			type:"post",
+			dataType:"json",
+			data:"id="+id+'&usuario='+usuario_id,
+			success: function(data)
+			{	
+				if(data.erro)
+				{
+					$(".alert-success").hide();
+					$(".alert-danger").hide();
+					$(".alert-danger").slideDown(500);
+					$("#msg_alert_erro").html(data.erro);
+				}
+				else
+				{
+					$(".alert-success").hide();
+					$(".alert-danger").hide();
+					//$(".alert-success").slideDown(500);						
+					//$("#msg_alert_sucesso").html(data.sucesso);					
+					$("#descricao").val(data.descricao);
+					$("#valor").val(data.valor);
+					$("#data").val(data.data);
+					$("#categoria").val(data.categoria_id);
+					//table.ajax.reload();
+					
+				}
+				
+			}
+			
+		});//FIM AJAX
+		
+	}
+	
+</script>
+
